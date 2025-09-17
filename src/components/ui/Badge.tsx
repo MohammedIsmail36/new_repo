@@ -93,7 +93,9 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, isReversed, className
       'ملغى': { variant: 'default' as const, icon: '⊘' },
       'معلق': { variant: 'warning' as const, icon: '◐' },
       'مكتمل': { variant: 'success' as const, icon: '✓' },
-      'جاري': { variant: 'primary' as const, icon: '◐' }
+      'جاري': { variant: 'primary' as const, icon: '◐' },
+      'نشط': { variant: 'success' as const, icon: '✓' },
+      'غير نشط': { variant: 'error' as const, icon: '×' }
     };
 
     return configs[status] || { variant: 'default' as const, icon: '?' };
