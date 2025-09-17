@@ -462,3 +462,49 @@ import { Button, Card, Input } from '@/components/ui';
 **الوضع الحالي:** مناسب لبدء **التطوير المتقدم** للوظائف التجارية وربط Backend! 🚀
 
 **آخر تحديث:** 17 سبتمبر 2025 - 10:00 صباحاً
+
+---
+
+## 🔑 **معلومات Git & SSH للمطور**
+
+### **Git Repository Info:**
+- **Repository:** https://github.com/MohammedIsmail36/new_repo.git
+- **SSH URL:** git@github.com:MohammedIsmail36/new_repo.git
+- **Local Status:** تم تهيئة git محلياً ✅
+- **Commit Hash:** 8607082
+- **Files:** 98 ملف (26,039 سطر)
+
+### **SSH Public Key (Ed25519 - جديد):**
+```
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEFJjLSnXWr9JcTUbVWOFfLqySAQrPZmojG9gr37oZh2 github-salesystem-key
+```
+
+### **SSH Public Key (RSA - قديم):**
+```
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCnkBHPxhZgYTat2y/r9xPA03hLZJEwnuczi9qf18d66QWHCeENbq6pCcHR5hHrid5O8TfOgMxUlOzF6WYl30tcXkNwfIjN14d2n3vUQsW+WvOVhbPGuizUfF7ckYtiIwTAUTWIXjvUJj3Ey5aZk6Y6ob/UneJV/6C0UPg5Bfque8w8k4Cgx+kQnEiW6nn4Kb323Y02a8pC3iKfEC/TXKKXTWms3d12MDxuW9tUCt+xDX736OnyIfIu/v+m0iyzqKLSQWQaiKcmmXwc4nHO4AOOTd/+ypnb5Q5VMMqIKIwGYltyxchdc6ztIKSH0kYLbZ9Mxa23UK1x3M4E1YbG/0cG7TEnkpTHt+tLZY2kGw61jElHEQYb0Vq1gfTJ2LSSfQUcG7nKF5oxZQc1FVVUx0waxMA8lMyUN2Ha6dU6kqgPf548AFmG0a0B9iXFl/jiehrEeTYJKfg7pT/Q3a0YJgRnh4up1dtPuGiMuppX3Mjef74D1oCYcp3502v7S5lq9NGdl/2ZqcVZVRLkuwUpz4Ztvt9m/fxUuDkqbjNEG57Pxt6Np97tVIzjKYQSYq5ZyTEOso7mF0878hkCskjyMGk8XSgECcw7vrWM1aukxYJSQDzRCi8QkyPAWO38HgT+g8ux8bNLqBJyEX8KrQG/KCypIiDoQ3Bq+yItt4WZ3P1v8Q== abosdam1981@gmail.com
+```
+
+### **خطوات إضافة SSH Key إلى GitHub:**
+1. انسخ المفتاح العام أعلاه
+2. اذهب إلى: https://github.com/settings/keys
+3. اضغط "New SSH key"
+4. العنوان: "Sales System Development Key"
+5. الصق المفتاح في خانة "Key"
+6. اضغط "Add SSH key"
+
+### **أوامر Git للنسخ الاحتياطي:**
+```bash
+# رفع التحديثات
+git add .
+git commit -m "Update: [وصف التحديث]"
+git push origin main
+
+# إنشاء نسخة احتياطية مضغوطة
+tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz --exclude='.git' --exclude='node_modules' .
+
+# استعادة من commit معين
+git checkout [commit-hash]
+```
+
+### **الملفات الاحتياطية المتوفرة:**
+- `sale-system-backup-20250917-110940.tar.gz` (210KB) ✅
