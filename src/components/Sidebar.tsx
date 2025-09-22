@@ -28,13 +28,26 @@ const menuItems = [
     href: '/dashboard'
   },
   {
+    id: 'accounting',
+    title: 'المحاسبة',
+    icon: Book,
+    href: '/accounting',
+    children: [
+      { title: 'شجرة الحسابات', href: '/accounting/chart-of-accounts' },
+      { title: 'القيود المحاسبية', href: '/accounting/journal-entries' },
+      { title: 'إضافة قيد يدوي', href: '/accounting/journal-entries/add' },
+      { title: 'سندات القبض', href: '/accounting/receipts' },
+      { title: 'سندات الصرف', href: '/accounting/payments' },
+    ],
+  },
+  {
     id: 'sales',
     title: 'المبيعات',
     icon: ShoppingCart,
     href: '/sales',
     children: [
-      { title: 'إدارة المبيعات', href: '/sales/management' },
-      { title: 'عروض الأسعار', href: '/sales/quotes' },
+      { title: 'العملاء', href: '/sales/customers' },
+      { title: 'أوامر البيع', href: '/sales/orders' },
       { title: 'فواتير المبيعات', href: '/sales/invoices' },
     ],
   },
@@ -44,58 +57,31 @@ const menuItems = [
     icon: Package,
     href: '/purchases',
     children: [
-      { title: 'إدارة المشتريات', href: '/purchases/management' },
-      { title: 'فواتير المشتريات', href: '/purchases/invoices' },
+      { title: 'الموردين', href: '/purchases/suppliers' },
+      { title: 'أوامر الشراء', href: '/purchases/orders' },
+      { title: 'فواتير الشراء', href: '/purchases/bills' },
     ],
   },
   {
     id: 'inventory',
     title: 'المخزون',
     icon: Warehouse,
-    href: '/inventory'
-  },
-  {
-    id: 'accounts',
-    title: 'الحسابات',
-    icon: Book,
-    href: '/accounts',
+    href: '/inventory',
     children: [
-      { title: 'شجرة الحسابات', href: '/accounts/chart-of-accounts' },
-      { title: 'القيود اليومية', href: '/accounts/journal-entry' },
-      { title: 'سندات القبض', href: '/accounts/receipts' },
-      { title: 'سندات الصرف', href: '/accounts/payments' },
-      { title: 'أرصدة البنوك', href: '/accounts/bank-balances' },
+      { title: 'المنتجات', href: '/inventory/products' },
+      { title: 'وحدات القياس', href: '/inventory/units' },
+      { title: 'العلامات التجارية', href: '/inventory/brands' },
     ],
   },
   {
-    id: 'reports',
-    title: 'التقارير',
-    icon: BarChart,
-    href: '/reports',
-    children: [
-      { title: 'التقارير المالية', href: '/reports/financial' },
-      { title: 'التقارير الضريبية', href: '/reports/tax' },
-      { title: 'تقارير المبيعات', href: '/reports/sales' },
-      { title: 'تقارير المشتريات', href: '/reports/purchases' },
-    ],
-  },
-  {
-    id: 'customers',
-    title: 'العملاء',
-    icon: UserCheck,
-    href: '/customers'
-  },
-  {
-    id: 'suppliers',
-    title: 'الموردين',
-    icon: Truck,
-    href: '/suppliers'
-  },
-  {
-    id: 'users',
-    title: 'المستخدمين',
+    id: 'management',
+    title: 'إدارة النظام',
     icon: Users,
-    href: '/users'
+    href: '/management',
+    children: [
+      { title: 'المستخدمين', href: '/management/users' },
+      { title: 'إضافة مستخدم', href: '/management/users/add' },
+    ],
   },
   {
     id: 'settings',
