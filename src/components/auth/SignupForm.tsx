@@ -496,7 +496,7 @@ export default function SignupForm({
           <p className="text-sm text-gray-600">
             لديك حساب بالفعل؟{' '}
             <Link
-              href="/auth/signin"
+              href="/signin"
               className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
             >
               تسجيل الدخول

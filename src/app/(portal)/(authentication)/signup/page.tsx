@@ -67,7 +67,7 @@ export default function SignUpPage() {
               <span className="text-lg font-semibold text-gray-900">نظام المبيعات والمحاسبة</span>
             </div>
             <nav className="hidden md:flex items-center gap-6">
-              <a href="/auth/signin" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <a href="/signin" className="text-gray-600 hover:text-gray-900 transition-colors">
                 تسجيل الدخول
               </a>
               <a href="/features" className="text-gray-600 hover:text-gray-900 transition-colors">

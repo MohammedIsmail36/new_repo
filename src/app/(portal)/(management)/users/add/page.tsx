@@ -19,7 +19,7 @@ export default function AddUserPage() {
   // التحقق من تسجيل الدخول فقط - أي مستخدم مسجل يمكنه إضافة مستخدمين
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/auth/signin');
+      router.push('/signin');
     }
   }, [session, status, router]);
 

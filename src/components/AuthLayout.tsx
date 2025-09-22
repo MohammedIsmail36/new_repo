@@ -18,16 +18,16 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(typeof window !== 'undefined' && window.innerWidth >= 1024);
 
-  // إعادة التوجيه إلى /auth/signin إذا لم يكن المستخدم مسجل دخوله
+  // إعادة التوجيه إلى /signin إذا لم يكن المستخدم مسجل دخوله
   useEffect(() => {
     if (status === 'loading') return;
-    if (!session && pathname !== '/auth/signin') {
-      router.push('/auth/signin');
+    if (!session && pathname !== '/signin') {
+      router.push('/signin');
     }
   }, [session, status, pathname, router]);
 
-  // إذا كان المسار هو /auth/signin، اعرض الأطفال فقط
-  if (pathname === '/auth/signin') {
+  // إذا كان المسار هو /signin، اعرض الأطفال فقط
+  if (pathname === '/signin') {
     return <div className="min-h-screen bg-gray-50">{children}</div>;
   }
 
@@ -67,6 +67,6 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
     );
   }
 
-  // إذا لم يكن المستخدم مسجل دخوله ولم يكن المسار /auth/signin
+  // إذا لم يكن المستخدم مسجل دخوله ولم يكن المسار /signin
   return null;
 }

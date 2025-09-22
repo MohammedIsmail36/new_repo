@@ -27,7 +27,7 @@ export default function Dashboard() {
   const { notifications } = useGlobalStore();
 
   useEffect(() => {
-    if (!session) router.push('/auth/signin');
+    if (!session) router.push('/signin');
   }, [session, router]);
 
   if (!session) return null;

@@ -82,7 +82,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
                   <button
                     onClick={() => {
                       setShowUserMenu(false);
-                      signOut({ callbackUrl: '/(portal)/(authentication)/signin' });
+                      signOut({ callbackUrl: '/signin' });
                     }}
                     className="w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
                   >
@@ -94,7 +94,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
             </div>
           ) : (
             <a
-              href="/(portal)/(authentication)/signin"
+              href="/signin"
               className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200"
             >
               تسجيل الدخول
