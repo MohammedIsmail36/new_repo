@@ -21,13 +21,13 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
   // إعادة التوجيه إلى /signin إذا لم يكن المستخدم مسجل دخوله
   useEffect(() => {
     if (status === 'loading') return;
-    if (!session && pathname !== '/signin') {
+    if (!session && pathname !== '/signin' && pathname !== '/signup') {
       router.push('/signin');
     }
   }, [session, status, pathname, router]);
 
-  // إذا كان المسار هو /signin، اعرض الأطفال فقط
-  if (pathname === '/signin') {
+  // إذا كان المسار هو صفحات المصادقة، اعرض الأطفال فقط بدون header/sidebar
+  if (pathname === '/signin' || pathname === '/signup') {
     return <div className="min-h-screen bg-gray-50">{children}</div>;
   }
 
