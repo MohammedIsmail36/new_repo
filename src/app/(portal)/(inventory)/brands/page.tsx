@@ -1,7 +1,7 @@
 'use client';
 
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { PageHeader } from '@/components/ui/PageHeader';
+import Breadcrumb from '@/components/ui/Breadcrumb';
+import PageHeader from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Plus, Award } from 'lucide-react';
 
