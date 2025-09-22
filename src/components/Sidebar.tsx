@@ -17,7 +17,13 @@ import {
   X,
   Building2,
   UserCheck,
-  Truck
+  Truck,
+  TrendingUp,
+  TrendingDown,
+  FileText,
+  CreditCard,
+  Tag,
+  DollarSign
 } from 'lucide-react';
 
 const menuItems = [
@@ -35,6 +41,7 @@ const menuItems = [
     children: [
       { title: 'شجرة الحسابات', href: '/chart-of-accounts' },
       { title: 'القيود المحاسبية', href: '/journal-entries' },
+      { title: 'عناصر اليومية', href: '/journal-entries-items' },
       { title: 'إضافة قيد يدوي', href: '/journal-entries/add' },
       { title: 'سندات القبض', href: '/receipts' },
       { title: 'سندات الصرف', href: '/payments' },
@@ -47,8 +54,9 @@ const menuItems = [
     href: '/sales',
     children: [
       { title: 'العملاء', href: '/customers' },
-      { title: 'أوامر البيع', href: '/sales-orders' },
-      { title: 'فواتير المبيعات', href: '/invoices' },
+      { title: 'فواتير المبيعات', href: '/sales-invoices' },
+      { title: 'مردودات المبيعات', href: '/sales-returns' },
+      { title: 'حركة العملاء', href: '/customer-transactions' },
     ],
   },
   {
@@ -58,8 +66,9 @@ const menuItems = [
     href: '/purchases',
     children: [
       { title: 'الموردين', href: '/suppliers' },
-      { title: 'أوامر الشراء', href: '/purchase-orders' },
-      { title: 'فواتير الشراء', href: '/bills' },
+      { title: 'فواتير المشتريات', href: '/purchase-invoices' },
+      { title: 'مردودات المشتريات', href: '/purchase-returns' },
+      { title: 'حركة الموردين', href: '/supplier-transactions' },
     ],
   },
   {
@@ -69,8 +78,20 @@ const menuItems = [
     href: '/inventory',
     children: [
       { title: 'المنتجات', href: '/products' },
+      { title: 'فئة المنتجات', href: '/product-categories' },
       { title: 'وحدات القياس', href: '/units' },
       { title: 'العلامات التجارية', href: '/brands' },
+    ],
+  },
+  {
+    id: 'expenses',
+    title: 'المصروفات',
+    icon: DollarSign,
+    href: '/expenses',
+    children: [
+      { title: 'أنواع المصروفات', href: '/expense-types' },
+      { title: 'إضافة مصروف جديد', href: '/expenses/add' },
+      { title: 'قائمة المصروفات', href: '/expenses/list' },
     ],
   },
   {
