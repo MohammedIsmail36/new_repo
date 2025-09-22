@@ -34,6 +34,16 @@ export {
   type SelectOption
 } from './Select';
 
+// New components for better UX
+export { default as ConfirmDialog } from './ConfirmDialog';
+export {
+  ToastProvider,
+  useToast,
+  toast
+} from './Toast';
+export { default as Breadcrumb, type BreadcrumbProps, type BreadcrumbItem } from './Breadcrumb';
+export { default as PageHeader, type PageHeaderProps } from './PageHeader';
+
 // Re-export existing shadcn components for backward compatibility
 // Note: Uncomment these if you have the original shadcn components
 // export { button as ButtonLegacy } from './button';

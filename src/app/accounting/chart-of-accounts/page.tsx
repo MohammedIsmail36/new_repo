@@ -11,16 +11,18 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Badge, StatusBadge } from '@/components/ui/Badge';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useToast, toast } from '@/components/ui/Toast';
+import PageHeader from '@/components/ui/PageHeader';
 import {
   PlusCircle,
   Edit,
   Trash2,
   Download,
-  Filter,
   Search,
   ChevronRight,
   ChevronDown,
-  MoreHorizontal,
+  ChevronUp,
   Eye,
   FileText,
   BarChart3,
@@ -34,7 +36,7 @@ import {
   Settings
 } from 'lucide-react';
 
-// استيراد الأنواع والبيانات
+// Import types and mock data
 import {
   ChartAccount,
   AccountType,
@@ -49,7 +51,7 @@ import {
   filterAccounts
 } from '@/lib/mockChartOfAccounts';
 
-// الألوان حسب نوع الحساب
+// Colors based on account type
 const accountTypeColors = {
   asset: 'bg-blue-50 text-blue-700 border-blue-200',
   liability: 'bg-red-50 text-red-700 border-red-200',
@@ -59,7 +61,7 @@ const accountTypeColors = {
   cost: 'bg-yellow-50 text-yellow-700 border-yellow-200'
 };
 
-// الأيقونات حسب نوع الحساب
+// Icons based on account type
 const accountTypeIcons = {
   asset: TrendingUp,
   liability: TrendingDown,
@@ -69,7 +71,7 @@ const accountTypeIcons = {
   cost: Calculator
 };
 
-// ترجمة أنواع الحسابات
+// Translation of account types
 const accountTypeLabels = {
   asset: 'الأصول',
   liability: 'الخصوم',
@@ -79,7 +81,7 @@ const accountTypeLabels = {
   cost: 'تكلفة المبيعات'
 };
 
-// ترجمة فئات الحسابات
+// Translation of account categories
 const accountCategoryLabels = {
   'current-assets': 'الأصول المتداولة',
   'fixed-assets': 'الأصول الثابتة',
@@ -100,7 +102,7 @@ const accountCategoryLabels = {
   'cost-of-goods-sold': 'تكلفة البضاعة المباعة'
 };
 
-// مكون عنصر الشجرة المبسط
+// Component for a single tree item
 interface SimpleTreeItemProps {
   account: ChartAccount;
   level: number;
@@ -138,7 +140,7 @@ function SimpleTreeItem({
           }
         }}
       >
-        {/* زر التوسيع/الطي */}
+        {/* expand/collapse button */}
         <div className="flex items-center w-6 mr-2">
           {hasChildren ? (
             <button
@@ -161,7 +163,7 @@ function SimpleTreeItem({
           )}
         </div>
 
-        {/* أيقونة نوع الحساب */}
+        {/* Account type icon */}
         <div className="flex items-center mr-3">
           <div className={`p-1.5 rounded ${accountTypeColors[account.type]}`}>
             <AccountIcon className="w-4 h-4" />
@@ -299,18 +301,12 @@ export default function ChartOfAccountsPage() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // حالات المودال والتوست الجديدة
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean; account: ChartAccount | null}>({isOpen: false, account: null});
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { showToast } = useToast();
 
-  // 1️⃣ دالة flatten لتحويل الشجرة إلى مصفوفة مسطحة
-  const flattenAccounts = (accounts: ChartAccount[]): ChartAccount[] => {
-    let result: ChartAccount[] = [];
-    for (const acc of accounts) {
-      result.push(acc);
-      if (acc.children && acc.children.length > 0) {
-        result = result.concat(flattenAccounts(acc.children));
-      }
-    }
-    return result;
-  };
+
 
   // فلترة محسنة ومطابقة لنظام filterAccounts
   const filteredAccounts = useMemo(() => {
@@ -322,7 +318,6 @@ export default function ChartOfAccountsPage() {
   const flatFilteredAccounts = useMemo(() => {
     return filterAccounts(accounts, filters);
   }, [accounts, filters]);
-
 
 
   // توسيع/طي العقد (محسن بـ useCallback)
@@ -338,15 +333,35 @@ export default function ChartOfAccountsPage() {
     });
   }, []);
 
-  // توسيع الكل
-  const expandAll = () => {
-    const allIds = accounts.filter(acc => acc.hasChildren).map(acc => acc.id);
-    setExpandedNodes(new Set(allIds));
+  // التحقق من حالة التوسيع العامة
+  const getAllExpandableIds = () => {
+    const getAllIds = (accounts: ChartAccount[]): string[] => {
+      let ids: string[] = [];
+      for (const account of accounts) {
+        if (account.hasChildren) {
+          ids.push(account.id);
+          if (account.children) {
+            ids = ids.concat(getAllIds(account.children));
+          }
+        }
+      }
+      return ids;
+    };
+    return getAllIds(filteredAccounts);
   };
 
-  // طي الكل
-  const collapseAll = () => {
-    setExpandedNodes(new Set());
+  const allExpandableIds = getAllExpandableIds();
+  const isAllExpanded = allExpandableIds.every(id => expandedNodes.has(id));
+
+  // دالة التبديل الذكي
+  const toggleAllExpansion = () => {
+    if (isAllExpanded) {
+      // إذا كان الكل موسع، نطوي الكل
+      setExpandedNodes(new Set());
+    } else {
+      // إذا لم يكن الكل موسع، نوسع الكل
+      setExpandedNodes(new Set(allExpandableIds));
+    }
   };
 
   // تحديث الفلاتر (محسن بـ useCallback)
@@ -362,8 +377,34 @@ export default function ChartOfAccountsPage() {
   };
 
   const handleDelete = (account: ChartAccount) => {
-    if (window.confirm(`هل أنت متأكد من حذف الحساب "${account.name}"؟`)) {
-      setAccounts(prev => prev.filter(acc => acc.id !== account.id));
+    setDeleteConfirm({ isOpen: true, account });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm.account) return;
+
+    setIsDeleting(true);
+    try {
+      // محاكاة API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      setAccounts(prev => prev.filter(acc => acc.id !== deleteConfirm.account!.id));
+
+      showToast(toast.success(
+        'تم حذف الحساب بنجاح',
+        `تم حذف الحساب "${deleteConfirm.account.name}" نهائياً`,
+        4000
+      ));
+
+      setDeleteConfirm({ isOpen: false, account: null });
+    } catch {
+      showToast(toast.error(
+        'خطأ في حذف الحساب',
+        'حدث خطأ أثناء حذف الحساب، يرجى المحاولة مرة أخرى',
+        5000
+      ));
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -394,20 +435,19 @@ export default function ChartOfAccountsPage() {
     }, 1000);
   };
 
+  const breadcrumbItems = [
+    { label: 'المحاسبة', href: '/accounting' },
+    { label: 'شجرة الحسابات', icon: <TreePine className="w-4 h-4" /> }
+  ];
+
   return (
     <div className="space-y-6 p-6">
-      {/* رأس الصفحة */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <TreePine className="w-8 h-8 text-green-600" />
-            شجرة الحسابات
-          </h1>
-          <p className="text-gray-600 mt-2 text-lg">
-            إدارة شاملة لدليل الحسابات والبيانات المحاسبية
-          </p>
-        </div>
-
+      {/* رأس الصفحة مع Breadcrumb */}
+      <PageHeader
+        title="شجرة الحسابات"
+        description="إدارة شاملة لدليل الحسابات والبيانات المحاسبية مع عرض تفاعلي للهيكل المحاسبي الكامل"
+        breadcrumbItems={breadcrumbItems}
+      >
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
@@ -426,15 +466,12 @@ export default function ChartOfAccountsPage() {
             تصدير
           </Button>
 
-          <Button
-            variant="default"
-            onClick={handleAddAccount}
-          >
+          <Button variant="default" onClick={handleAddAccount}>
             <PlusCircle className="w-4 h-4 ml-2" />
             حساب جديد
           </Button>
         </div>
-      </div>
+      </PageHeader>
 
       {/* إحصائيات سريعة */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -543,244 +580,203 @@ export default function ChartOfAccountsPage() {
         </Card>
       </div>
 
-      {/* شريط البحث والفلاتر العصري */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        {/* الصف العلوي - البحث والفلاتر الأساسية */}
-        <div className="flex flex-col xl:flex-row xl:items-center gap-4 mb-6">
-          {/* بحث متقدم */}
-          <div className="relative flex-1 max-w-lg">
-            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              placeholder="🔍 بحث في الحسابات بالاسم أو الكود..."
-              value={filters.search || ''}
-              onChange={(e) => updateFilters({ search: e.target.value })}
-              className="pr-12 h-12 text-base border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg"
-            />
-            {filters.search && (
-              <button
-                onClick={() => updateFilters({ search: '' })}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                ×
-              </button>
-            )}
-          </div>
-
-          {/* فلاتر سريعة */}
-          <div className="flex gap-3">
-            <Select
-              placeholder="نوع الحساب"
-              value={filters.type || ''}
-              onChange={(e) => updateFilters({ type: e.target.value as AccountType })}
-              options={[
-                { value: '', label: 'جميع الأنواع' },
-                ...Object.entries(accountTypeLabels).map(([key, label]) => ({
-                  value: key,
-                  label: label
-                }))
-              ]}
-            />
-
-            <Select
-              placeholder="الحالة"
-              value={filters.status || ''}
-              onChange={(e) => updateFilters({ status: e.target.value as 'active' | 'inactive' })}
-              options={[
-                { value: '', label: 'جميع الحالات' },
-                { value: 'active', label: '✅ نشط' },
-                { value: 'inactive', label: '❌ غير نشط' }
-              ]}
-            />
-          </div>
+      {/* شريط البحث والفلاتر المحسن */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        {/* البحث الرئيسي */}
+        <div className="relative mb-5">
+          <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Input
+            placeholder="🔍 البحث في دليل الحسابات..."
+            value={filters.search || ''}
+            onChange={(e) => updateFilters({ search: e.target.value })}
+            className="pr-12 h-11 text-base border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg"
+          />
+          {filters.search && (
+            <button
+              onClick={() => updateFilters({ search: '' })}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              ×
+            </button>
+          )}
         </div>
 
-        {/* الصف السفلي - أدوات التحكم */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          {/* خيارات العرض */}
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={showBalances}
-                  onChange={(e) => setShowBalances(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
-                />
-                <span>💰 عرض الأرصدة</span>
-              </label>
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={showCodes}
-                  onChange={(e) => setShowCodes(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
-                />
-                <span>🏷️ عرض الأكواد</span>
-              </label>
-            </div>
+        {/* الفلاتر السريعة في صف واحد */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+          <Select
+            placeholder="نوع الحساب"
+            value={filters.type || ''}
+            onChange={(e) => updateFilters({ type: e.target.value as AccountType })}
+            options={[
+              { value: '', label: 'جميع الأنواع' },
+              ...Object.entries(accountTypeLabels).map(([key, label]) => ({
+                value: key,
+                label: label
+              }))
+            ]}
+          />
 
-            {/* مؤشرات الفلترة */}
+          <Select
+            placeholder="الحالة"
+            value={filters.status || ''}
+            onChange={(e) => updateFilters({ status: e.target.value as 'active' | 'inactive' })}
+            options={[
+              { value: '', label: 'جميع الحالات' },
+              { value: 'active', label: '✅ نشط' },
+              { value: 'inactive', label: '❌ غير نشط' }
+            ]}
+          />
+
+          <Select
+            placeholder="مستوى الحساب"
+            value={filters.level?.toString() || ''}
+            onChange={(e) => {
+              const value = e.target.value;
+              updateFilters({ level: value && value !== '' ? parseInt(value) : undefined });
+            }}
+            options={[
+              { value: '', label: 'جميع المستويات' },
+              { value: '1', label: 'مستوى 1 - رئيسية' },
+              { value: '2', label: 'مستوى 2 - فرعية' },
+              { value: '3', label: 'مستوى 3 - تفصيلية' },
+              { value: '4', label: 'مستوى 4 - نهائية' }
+            ]}
+          />
+
+          <Select
+            placeholder="فئة الحساب"
+            value={filters.category || ''}
+            onChange={(e) => updateFilters({ category: e.target.value as AccountCategory })}
+            options={[
+              { value: '', label: 'جميع الفئات' },
+              ...Object.entries(accountCategoryLabels).map(([key, label]) => ({
+                value: key,
+                label: label
+              }))
+            ]}
+          />
+        </div>
+
+        {/* خيارات العرض والتحكم */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-gray-100">
+          {/* خيارات العرض */}
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={showBalances}
+                onChange={(e) => setShowBalances(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded border-gray-300"
+              />
+              <span>💰 الأرصدة</span>
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={showCodes}
+                onChange={(e) => setShowCodes(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded border-gray-300"
+              />
+              <span>🏷️ الأكواد</span>
+            </label>
+
+            {/* فلتر خاص بالرصيد */}
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={filters.hasBalance === true}
+                onChange={(e) => updateFilters({ hasBalance: e.target.checked || undefined })}
+                className="w-4 h-4 text-green-600 rounded border-gray-300"
+              />
+              <span>📊 ذات رصيد فقط</span>
+            </label>
+          </div>
+
+          {/* مؤشرات الفلترة */}
+          <div className="flex items-center gap-3">
             {Object.keys(filters).length > 0 && (
-              <div className="flex items-center gap-2">
+              <>
                 <span className="text-sm text-blue-600 font-medium">
                   🎯 {Object.keys(filters).length} فلتر نشط
                 </span>
                 <button
                   onClick={() => setFilters({})}
-                  className="text-xs text-red-600 hover:text-red-800 underline"
+                  className="text-sm text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50"
                 >
                   مسح الكل
                 </button>
-              </div>
+              </>
             )}
-          </div>
-
-          {/* أزرار طريقة العرض والتحكم */}
-          <div className="flex items-center gap-3">
-            {/* أزرار التوسيع للشجرة */}
-            {viewMode === 'tree' && (
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={expandAll}
-                  className="text-xs"
-                >
-                  توسيع الكل
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={collapseAll}
-                  className="text-xs"
-                >
-                  طي الكل
-                </Button>
-              </div>
-            )}
-
-            {/* مبدل طريقة العرض */}
-            <div className="flex rounded-lg border-2 border-gray-200 p-1 bg-gray-50">
-              <button
-                onClick={() => setViewMode('list')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
-                  viewMode === 'list'
-                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-white'
-                }`}
-              >
-                <FileText className="w-4 h-4" />
-                📋 جدول
-              </button>
-              <button
-                onClick={() => setViewMode('tree')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
-                  viewMode === 'tree'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-white'
-                }`}
-              >
-                <TreePine className="w-4 h-4" />
-                🌳 شجرة
-              </button>
-            </div>
           </div>
         </div>
 
-
-          {/* فلاتر متقدمة قابلة للطي */}
-          <div className="border-t border-gray-200 pt-4">
-            <details className="group">
-              <summary className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-                <Filter className="w-4 h-4" />
-                <span>فلاتر متقدمة</span>
-                <ChevronRight className="w-4 h-4 transition-transform group-open:rotate-90" />
-              </summary>
-
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
-                {/* فلتر الفئة */}
-                <div>
-                  <label className="text-xs font-medium text-gray-700 mb-2 block">فئة الحساب</label>
-                  <Select
-                    placeholder="جميع الفئات"
-                    value={filters.category || ''}
-                    onChange={(e) => updateFilters({ category: e.target.value as AccountCategory })}
-                    options={[
-                      { value: '', label: 'جميع الفئات' },
-                      ...Object.entries(accountCategoryLabels).map(([key, label]) => ({
-                        value: key,
-                        label: label
-                      }))
-                    ]}
-                  />
-                </div>
-
-                {/* فلتر المستوى */}
-              <div>
-                <label className="text-xs font-medium text-gray-700 mb-2 block">مستوى الحساب</label>
-                <Select
-                  value={filters.level?.toString() || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    updateFilters({ level: value && value !== '' ? parseInt(value) : undefined });
-                  }}
-                  options={[
-                    { value: '', label: 'جميع المستويات' },
-                    { value: '1', label: 'مستوى 1 - رئيسية' },
-                    { value: '2', label: 'مستوى 2 - فرعية' },
-                    { value: '3', label: 'مستوى 3 - تفصيلية' },
-                    { value: '4', label: 'مستوى 4 - نهائية' }
-                  ]}
-                />
-              </div>
-
-                {/* فلاتر خاصة */}
-                <div>
-                  <label className="text-xs font-medium text-gray-700 mb-2 block">فلاتر خاصة</label>
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={filters.hasBalance === true}
-                        onChange={(e) => updateFilters({ hasBalance: e.target.checked || undefined })}
-                        className="w-4 h-4 text-green-600 rounded"
-                      />
-                      <span>الحسابات ذات رصيد</span>
-                    </label>
-
-
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={!!filters.level && filters.level === 1} // تحويل undefined إلى false
-                        onChange={(e) => updateFilters({ level: e.target.checked ? 1 : undefined })}
-                        className="w-4 h-4 text-purple-600 rounded"
-                      />
-                      <span>الحسابات الرئيسية فقط</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
       </div>
 
       {/* شجرة الحسابات */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <CardTitle className="flex items-center gap-2">
               <TreePine className="w-5 h-5 text-green-600" />
               دليل الحسابات
             </CardTitle>
 
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span>
-                عدد النتائج: {viewMode === 'tree' ? filteredAccounts.length : flatFilteredAccounts.length}
-                {Object.keys(filters).length > 0 && (
-                  <span className="mr-2 text-blue-600">• مفلترة</span>
-                )}
-              </span>
+            <div className="flex items-center gap-4">
+              {/* أزرار نمط العرض - صغيرة واحترافية */}
+              <div className="flex bg-gray-100 rounded-md p-0.5">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${
+                    viewMode === 'list'
+                      ? 'bg-white text-green-600 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  قائمة
+                </button>
+                <button
+                  onClick={() => setViewMode('tree')}
+                  className={`px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5 ${
+                    viewMode === 'tree'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <TreePine className="w-3.5 h-3.5" />
+                  شجرة
+                </button>
+              </div>
+
+              {/* زر التوسيع/الطي الذكي للشجرة */}
+              {viewMode === 'tree' && allExpandableIds.length > 0 && (
+                <button
+                  onClick={toggleAllExpansion}
+                  className="px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5 border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 text-gray-700 hover:text-gray-900"
+                >
+                  {isAllExpanded ? (
+                    <>
+                      <ChevronUp className="w-3.5 h-3.5" />
+                      طي الكل
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-3.5 h-3.5" />
+                      توسيع الكل
+                    </>
+                  )}
+                </button>
+              )}
+
+              {/* عدد النتائج */}
+              <div className="text-sm text-gray-600">
+                <span>
+                  عدد النتائج: {viewMode === 'tree' ? filteredAccounts.length : flatFilteredAccounts.length}
+                  {Object.keys(filters).length > 0 && (
+                    <span className="mr-2 text-blue-600">• مفلترة</span>
+                  )}
+                </span>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -1296,6 +1292,19 @@ export default function ChartOfAccountsPage() {
           </div>
         </div>
       )}
+
+      {/* مودال تأكيد الحذف العصري */}
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, account: null })}
+        onConfirm={confirmDelete}
+        title="حذف الحساب"
+        message={`هل أنت متأكد من حذف الحساب "${deleteConfirm.account?.name}"؟ لا يمكن التراجع عن هذا الإجراء.`}
+        confirmText="حذف"
+        cancelText="إلغاء"
+        type="danger"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

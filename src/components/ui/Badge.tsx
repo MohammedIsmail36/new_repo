@@ -15,6 +15,7 @@ const badgeVariants = cva(
         success: "bg-success-100 text-success-800 border border-success-200",
         warning: "bg-warning-100 text-warning-800 border border-warning-200",
         error: "bg-error-100 text-error-800 border border-error-200",
+        destructive: "bg-red-100 text-red-800 border border-red-200",
         outline: "text-secondary-700 border border-secondary-300 bg-transparent",
         ghost: "text-secondary-600 bg-transparent"
       },
@@ -77,14 +78,15 @@ const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
 
 Badge.displayName = "Badge";
 
-// Status Badge Component - خاص بحالات الطلبات والفواتير
+// Status Badge Component - خاص بحالات الطلبات والفواتير والحسابات
 export interface StatusBadgeProps {
-  status: 'مدفوع' | 'غير مدفوع' | 'متأخر' | 'ملغى' | 'معلق' | 'مكتمل' | 'جاري';
+  status: 'مدفوع' | 'غير مدفوع' | 'متأخر' | 'ملغى' | 'معلق' | 'مكتمل' | 'جاري' | 'نشط' | 'غير نشط';
   isReversed?: boolean;
   className?: string;
+  size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
-const StatusBadge: React.FC<StatusBadgeProps> = ({ status, isReversed, className }) => {
+const StatusBadge: React.FC<StatusBadgeProps> = ({ status, isReversed, className, size = 'sm' }) => {
   const getStatusConfig = (status: string) => {
     const configs = {
       'مدفوع': { variant: 'success' as const, icon: '✓' },
@@ -105,14 +107,14 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, isReversed, className
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <Badge variant={config.variant} size="sm" icon={config.icon}>
+      <Badge variant={config.variant} size={size} icon={config.icon}>
         {status}
       </Badge>
 
       {isReversed && (
         <Badge
           variant="warning"
-          size="sm"
+          size={size}
           className="bg-orange-100 text-orange-800 border-orange-200"
         >
           مسترد

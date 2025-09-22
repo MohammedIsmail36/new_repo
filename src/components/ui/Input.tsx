@@ -5,11 +5,11 @@ import { Eye, EyeOff } from 'lucide-react';
 
 // Input Component Variants
 const inputVariants = cva(
-  "input focus-ring transition-colors",
+  "input transition-colors focus:outline-none focus:ring-1 focus:ring-primary-200",
   {
     variants: {
       variant: {
-        default: "border-secondary-300 focus:border-primary-500",
+        default: "border-gray-300 focus:border-primary-400",
         success: "border-success-300 focus:border-success-500",
         error: "border-error-300 focus:border-error-500 text-error-900",
         warning: "border-warning-300 focus:border-warning-500"

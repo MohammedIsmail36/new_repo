@@ -158,6 +158,16 @@
   gap: var(--spacing-2);
 }
 
+.btn:hover {
+  background-color: var(--primary-600);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn span {
+  display: contents;
+}
+
 .btn:focus {
   outline: 2px solid var(--primary-500);
   outline-offset: 2px;
@@ -237,8 +247,10 @@
 }
 
 .focus-ring:focus {
-  outline: 2px solid var(--primary-500);
-  outline-offset: 2px;
+  outline: none;
+  ring: 1px;
+  ring-color: var(--primary-300);
+  border-color: var(--primary-500);
 }
 
 /* ======================================
@@ -516,4 +528,35 @@ html, body {
 
 .transition-transform {
   transition: transform var(--transition-fast);
+}
+
+/* Toast animations */
+@keyframes toast-slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out-right {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-toast-in {
+  animation: toast-slide-in-right 0.3s ease-out;
+}
+
+.animate-toast-out {
+  animation: toast-slide-out-right 0.3s ease-in;
 }
