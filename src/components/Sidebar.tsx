@@ -33,11 +33,11 @@ const menuItems = [
     icon: Book,
     href: '/accounting',
     children: [
-      { title: 'شجرة الحسابات', href: '/accounting/chart-of-accounts' },
-      { title: 'القيود المحاسبية', href: '/accounting/journal-entries' },
-      { title: 'إضافة قيد يدوي', href: '/accounting/journal-entries/add' },
-      { title: 'سندات القبض', href: '/accounting/receipts' },
-      { title: 'سندات الصرف', href: '/accounting/payments' },
+      { title: 'شجرة الحسابات', href: '/chart-of-accounts' },
+      { title: 'القيود المحاسبية', href: '/journal-entries' },
+      { title: 'إضافة قيد يدوي', href: '/journal-entries/add' },
+      { title: 'سندات القبض', href: '/receipts' },
+      { title: 'سندات الصرف', href: '/payments' },
     ],
   },
   {
@@ -46,9 +46,9 @@ const menuItems = [
     icon: ShoppingCart,
     href: '/sales',
     children: [
-      { title: 'العملاء', href: '/sales/customers' },
-      { title: 'أوامر البيع', href: '/sales/orders' },
-      { title: 'فواتير المبيعات', href: '/sales/invoices' },
+      { title: 'العملاء', href: '/customers' },
+      { title: 'أوامر البيع', href: '/sales-orders' },
+      { title: 'فواتير المبيعات', href: '/invoices' },
     ],
   },
   {
@@ -57,9 +57,9 @@ const menuItems = [
     icon: Package,
     href: '/purchases',
     children: [
-      { title: 'الموردين', href: '/purchases/suppliers' },
-      { title: 'أوامر الشراء', href: '/purchases/orders' },
-      { title: 'فواتير الشراء', href: '/purchases/bills' },
+      { title: 'الموردين', href: '/suppliers' },
+      { title: 'أوامر الشراء', href: '/purchase-orders' },
+      { title: 'فواتير الشراء', href: '/bills' },
     ],
   },
   {
@@ -68,9 +68,9 @@ const menuItems = [
     icon: Warehouse,
     href: '/inventory',
     children: [
-      { title: 'المنتجات', href: '/inventory/products' },
-      { title: 'وحدات القياس', href: '/inventory/units' },
-      { title: 'العلامات التجارية', href: '/inventory/brands' },
+      { title: 'المنتجات', href: '/products' },
+      { title: 'وحدات القياس', href: '/units' },
+      { title: 'العلامات التجارية', href: '/brands' },
     ],
   },
   {
@@ -79,8 +79,8 @@ const menuItems = [
     icon: Users,
     href: '/management',
     children: [
-      { title: 'المستخدمين', href: '/management/users' },
-      { title: 'إضافة مستخدم', href: '/management/users/add' },
+      { title: 'المستخدمين', href: '/users' },
+      { title: 'إضافة مستخدم', href: '/users/add' },
     ],
   },
   {

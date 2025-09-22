@@ -13,7 +13,7 @@ export default function SalesOrdersPage() {
           items={[
             { label: 'الرئيسية', href: '/' },
             { label: 'المبيعات', href: '/sales' },
-            { label: 'أوامر البيع', href: '/sales/orders' }
+            { label: 'أوامر البيع', href: '/sales/sales-orders' }
           ]}
         />
 

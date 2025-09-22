@@ -13,7 +13,7 @@ export default function PurchaseOrdersPage() {
           items={[
             { label: 'الرئيسية', href: '/' },
             { label: 'المشتريات', href: '/purchases' },
-            { label: 'أوامر الشراء', href: '/purchases/orders' }
+            { label: 'أوامر الشراء', href: '/purchases/purchase-orders' }
           ]}
         />
 
